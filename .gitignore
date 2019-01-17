@@ -2,4 +2,6 @@
 *~
 __pycache__
 myvenv
+db.sql
 /static
+.DS_Store
