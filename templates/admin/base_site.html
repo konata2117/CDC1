@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Sitio administración') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">CADENA DE CUSTODIA</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
