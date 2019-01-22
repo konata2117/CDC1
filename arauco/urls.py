@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url
+from formularioscdc import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('pdf/', views.generate_pdf, name='pdf'),
+
+    #url(r'^pdf/
+    # $',PDFTemplateView.as_view(template_name='my_template.html',filename='my_pdf.pdf'), name='pdf'),
+    #url(r'^$',views.index.name='indec'),
 ]

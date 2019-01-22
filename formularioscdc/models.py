@@ -101,7 +101,7 @@ class Realiza(models.Model):
         return self.pregunta
 
 class Respuesta(models.Model):
-    #pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE)
+    pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True,null=True)
     respuesta=models.CharField(max_length=30)
     def __str__(self):
         return self.respuesta
@@ -134,6 +134,6 @@ class Formulario(models.Model):
         print ("ACA")
     
     class Meta:
-        verbose_name="Formulario"
-        verbose_name_plural="Formularios"
+       verbose_name="Formulario"
+       verbose_name_plural="Formularios"
 
