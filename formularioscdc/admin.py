@@ -3,38 +3,57 @@ from .models import Formulario, Pregunta,Respuesta, Proveedor, Comuna, Rol,Reali
 from .resources import FormularioResource
 from import_export.admin import ImportExportModelAdmin
 from import_export.admin import ImportExportActionModelAdmin
-#dataset=FormularioResource().export()
+from formularioscdc.views import GeneratePDF
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    
+from io import StringIO
+from reportlab.platypus import BaseDocTemplate, Paragraph, Frame
+
+def Generar_pdf(modeladmin,request,queryset):
+    response = HttpResponse(content_type='application/pdf')
+    print (queryset[0])
+    response['Content-Disposition']= 'filename= qr.rol.pdf'
+    buffer =BytesIO()
+    c= canvas.Canvas(buffer)
+    signfr=Frame(5.1*inch,1.2*inch,2.8*inch,0.44*inch,showBoundary=1)
+    story=[]
+    doc=BaseDocTemplate(buffer,showBoundary=1, leftMargin=0.1*inch, rightMargin=0.1*inch,topMargin=0.1*inch,bottomMargin=0.1*inch)
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Vendana9', fontName='Vendana', fontSize=9))
+    
+    #for qs in queryset:
+    c.drawString(100,100,"esto es una prueba")
+    c.showPage()
+    c.save()
+    pdf=buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
 class Froe(admin.ModelAdmin):
     fieldsets=[
         ('Información Personal', {'fields':['encargado','proveedor','rol','comuna']}),
         
    ]
-   #search_fields=['pregunta','comuna']
-   #list_filter=['pregunta','comuna']
+   
 class ChoiceInline(admin.TabularInline):
     model =Pregunta
-class FormularioAdmin(admin.ModelAdmin):
-    #def get_user_link(self,obj):
-       #return  <a>< href="admin/formularioscdc/formulario/ + 'str(obj.id)+' "class="detail_user"> PDF</a>
-    #get_user_link.short_description= 'Formulario'
-    #get_user_link.allow_tags=True    
+class FormularioAd(admin.ModelAdmin):
+     
     list_display=('id','rol','proveedor','encargado','created_date','imagen')
-   # some_view(request.POST)
     fieldsets=[
         ('Información Personal', {'fields':['encargado','proveedor','comuna','rol','predio','imagen']}),
         ('Medidas de Control', {'fields':['pregunta','respuesta']}),
     ]
-
+    actions =[Generar_pdf]
 class FormularioAdmin(ImportExportModelAdmin):
         resource_class=FormularioResource
+        list_display=('id','rol','proveedor','encargado','created_date','imagen')
 class FormularioAdmin(ImportExportActionModelAdmin):
     pass
-#formulario_resource = FormularioResource()
-#dataset=formulario_resource.export()
-#print(dataset.csv)
-#class PDF(PDFTemplateView):
- #   filename='prueba.pdf'
-  #  template_name="prueba.html"
 
 class Predios(admin.ModelAdmin):
     list_display=('rol','proveedor')
@@ -76,13 +95,9 @@ class Pre(admin.ModelAdmin):
 
 
   #inlines=[ChoiceInline] 
-admin.site.register(Formulario, FormularioAdmin)    
-#admin.site.register(Formulario,Froe)
-
+admin.site.register(Formulario, FormularioAd)    
 admin.site.register(Pregunta,Pre)
 admin.site.register(Respuesta)
 admin.site.register(Proveedor)
 admin.site.register(Comuna)
-# Register your models here.
 admin.site.register(Rol,Predios)
-#admin.site.register(Realiza,PDF)

@@ -132,7 +132,8 @@ class Formulario(models.Model):
     respuesta=models.ForeignKey(Respuesta,on_delete=models.CASCADE,null=True,blank=True)
     def contador_preguntas(self, comuna):
         print ("ACA")
-    
+    def __str__(self):
+        return self.predio
     class Meta:
        verbose_name="Formulario"
        verbose_name_plural="Formularios"

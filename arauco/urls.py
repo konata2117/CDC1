@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
-from formularioscdc import views
+from formularioscdc.views import GeneratePDF
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('pdf/', views.generate_pdf, name='pdf'),
+    url(r'^admin/',admin.site.urls),
+    url(r'^pdf/',GeneratePDF,name="pdf"),
+    #path('admin/', admin.site.urls),
+    #path('pdf/', views.generate_pdf, name='pdf'),
 
     #url(r'^pdf/
     # $',PDFTemplateView.as_view(template_name='my_template.html',filename='my_pdf.pdf'), name='pdf'),
