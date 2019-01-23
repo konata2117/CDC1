@@ -15,18 +15,36 @@ from reportlab.platypus import BaseDocTemplate, Paragraph, Frame
 
 def Generar_pdf(modeladmin,request,queryset):
     response = HttpResponse(content_type='application/pdf')
-    print (queryset[0])
+    
     response['Content-Disposition']= 'filename= qr.rol.pdf'
     buffer =BytesIO()
     c= canvas.Canvas(buffer)
-    signfr=Frame(5.1*inch,1.2*inch,2.8*inch,0.44*inch,showBoundary=1)
-    story=[]
-    doc=BaseDocTemplate(buffer,showBoundary=1, leftMargin=0.1*inch, rightMargin=0.1*inch,topMargin=0.1*inch,bottomMargin=0.1*inch)
-    styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Vendana9', fontName='Vendana', fontSize=9))
-    
-    #for qs in queryset:
-    c.drawString(100,100,"esto es una prueba")
+    for qs in queryset:
+        nombre = qs.proveedor
+        id= qs.id
+        fecha= qs.created_date
+        predio=qs.predio
+        id_proveedor=qs.proveedor_id
+    print (nombre,id,fecha,predio,id_proveedor)
+    rut_proveedor=Proveedor.objects.get(id=id_proveedor)
+    print (rut_proveedor.rut)
+    c.drawImage("imagenes/Arauco-logo.jpg",60,740,100,100,preserveAspectRatio=True)
+    c.drawString(170,750,"REPORTE VISITA CONTROL DE COMPRA")
+    c.line(60,740,540,740)
+    c.rect(60,710,480,23)
+    c.drawString(230,715,"DETALLE FORMULARIO")
+    c.drawString(60,690,"ID ")
+    c.drawString(305,690,"FECHA")
+    c.rect(60,660,235,20)
+    c.rect(305,660,235,20)
+    c.drawString(175,665,str(id))
+    c.drawString(345,665,str(fecha))
+    c.drawString(60,640,"RUT PROVEEDOR")
+    c.drawString(305,640,"PROVEEDOR")
+    c.rect(60,610,235,20)
+    c.rect(305,610,235,20)
+    c.drawString(145,615,str(rut_proveedor.rut))
+    c.drawString(345,615,str(nombre))
     c.showPage()
     c.save()
     pdf=buffer.getvalue()
