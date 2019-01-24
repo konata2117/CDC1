@@ -97,8 +97,8 @@ class Pregunta(models.Model):
 class Realiza(models.Model):
     comuna=models.ForeignKey(Comuna,on_delete=models.CASCADE)
     pregunta =models.ForeignKey(Pregunta,on_delete=models.CASCADE)
-    def __str__(self):
-        return self.pregunta
+    #def __str__(self):
+     #   return "uno"
 
 class Respuesta(models.Model):
     pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True,null=True)
