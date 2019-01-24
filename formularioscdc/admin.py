@@ -14,15 +14,12 @@ from io import StringIO
 from reportlab.platypus import BaseDocTemplate, Paragraph, Frame
 
 
-def categorias():
+def indicadores():
     preguntas=Pregunta.objects.all()
-    print (preguntas)
-    print(preguntas[1].unodos, preguntas[1])
-    print ("tamaño: ", preguntas.count())
     list = []
     pregunt={}
     cate={}
-    nom=[]
+    nom=[] # creo una lista que va a contener los nombres de las categorias
     nom.append("unouno")
     nom.append("unodos")
     nom.append("unotres")
@@ -62,7 +59,7 @@ def categorias():
     #print (preguntas[0])
     for i in range(numero):
         cate[preguntas[i]]=[]
-    for i in range(numero):
+    for i in range(numero): #obtengo un un diccionario con una lista de los valores de las categorias
         cate[preguntas[i]].append(preguntas[i].unouno)
         cate[preguntas[i]].append(preguntas[i].unodos)
         cate[preguntas[i]].append(preguntas[i].unotres)
@@ -96,27 +93,132 @@ def categorias():
         cate[preguntas[i]].append(preguntas[i].cuatro)
         cate[preguntas[i]].append(preguntas[i].cinco)
 
-    #print ("lista: ", cate)
     
-    for i in range(numero):
+    for i in range(numero): #obtengo los indicadores de las preguntas que se van a realizar 
         pregunt[preguntas[i]]=[]
-    #for i in range(numero):
         for j in range(32):
-            #print (cate[preguntas[i]][j])
+            
             if cate[preguntas[i]][j]==True:
                 pregunt[preguntas[i]].append(nom[j])
-            #if  preguntas[i].unouno ==True:
-             #   pregunt[preguntas[i]].append("unouno")
-              #  continue
             
-           
-    #print (list)
-    print (pregunt)
-    #print("numero: ", numero)
-    #for i in numero:
-     #   for pregunta in preguntas:
-      #      print(pregunta[i].unouno)
+    #print (pregunt)
+    return pregunt 
+def riesgos():
+    comunas=Comuna.objects.all()
+    list = []
+    comun={}
+    riesgo={}
+    nom=[] # creo una lista que va a contener los nombres de las categorias
+    nom.append("unouno")
+    nom.append("unodos")
+    nom.append("unotres")
+    nom.append("unocuatro")
+    nom.append("unocinco")
+    nom.append("unoseis")
+    nom.append("unosiete")
+    nom.append("unoocho")
+    nom.append("unonueve")
+    nom.append("unodiez")
+    nom.append("unoonce")
+    nom.append("unodoce")
+    nom.append("unotrece")
+    nom.append("unocatorce")
+    nom.append("unoquince")
+    nom.append("unodieciseis")
+    nom.append("unodiecisiete")
+    nom.append("unodieciocho")
+    nom.append("unodiecinueve")
+    nom.append("unoveinte")
+    nom.append("unoveintiuno")
+    nom.append("dosuno")
+    nom.append("dosdos")
+    nom.append("dostres")
+    nom.append("tres")
+    nom.append("tresuno")
+    nom.append("tresdos")
+    nom.append("trestres")
+    nom.append("trescuatro")
+    nom.append("trescinco")
+    nom.append("tresseis")
+    nom.append("cuatro")
+    nom.append("cinco")
+    #print ("nom: ", nom)
 
+    numero=comunas.count()
+    #print (preguntas[0])
+    for i in range(numero):
+        comun[comunas[i]]=[]
+    for i in range(numero): #obtengo un un diccionario con una lista de los valores de las categorias
+        comun[comunas[i]].append(comunas[i].unouno)
+        comun[comunas[i]].append(comunas[i].unodos)
+        comun[comunas[i]].append(comunas[i].unotres)
+        comun[comunas[i]].append(comunas[i].unocuatro)
+        comun[comunas[i]].append(comunas[i].unocinco)
+        comun[comunas[i]].append(comunas[i].unoseis)
+        comun[comunas[i]].append(comunas[i].unosiete)
+        comun[comunas[i]].append(comunas[i].unoocho)
+        comun[comunas[i]].append(comunas[i].unonueve)
+        comun[comunas[i]].append(comunas[i].unodiez)
+        comun[comunas[i]].append(comunas[i].unoonce)
+        comun[comunas[i]].append(comunas[i].unodoce)
+        comun[comunas[i]].append(comunas[i].unotrece)
+        comun[comunas[i]].append(comunas[i].unocatorce)
+        comun[comunas[i]].append(comunas[i].unoquince)
+        comun[comunas[i]].append(comunas[i].unodieciseis)
+        comun[comunas[i]].append(comunas[i].unodieciocho)
+        comun[comunas[i]].append(comunas[i].unodiecinueve)
+        comun[comunas[i]].append(comunas[i].unoveinte)
+        comun[comunas[i]].append(comunas[i].unoveintiuno)
+        comun[comunas[i]].append(comunas[i].dosuno)
+        comun[comunas[i]].append(comunas[i].dosdos)
+        comun[comunas[i]].append(comunas[i].dostres)
+        comun[comunas[i]].append(comunas[i].tres)
+        comun[comunas[i]].append(comunas[i].tresuno)
+        comun[comunas[i]].append(comunas[i].tresdos)
+        comun[comunas[i]].append(comunas[i].trestres)
+        comun[comunas[i]].append(comunas[i].trescuatro)
+        comun[comunas[i]].append(comunas[i].trescinco)
+        comun[comunas[i]].append(comunas[i].tresseis)
+        comun[comunas[i]].append(comunas[i].cuatro)
+        comun[comunas[i]].append(comunas[i].cinco)
+
+    
+    for i in range(numero): #obtengo los indicadores de las preguntas que se van a realizar 
+        riesgo[comunas[i]]=[]
+        for j in range(32):
+            
+            if comun[comunas[i]][j]==True:
+                riesgo[comunas[i]].append(nom[j])
+            
+    #print (riesgo)
+    return riesgo
+
+def se_realiza():
+    comunas=riesgos()
+    comu=Comuna.objects.all()
+    pregun=Pregunta.objects.all()
+    preguntas=indicadores()
+    la=set()
+    co={}
+    for i in range (len(comunas)):
+        co[comu[i]]=set()
+    
+    lis =[]
+    for i in range(len(comunas)):
+        print (len(comunas[comu[i]]))
+        for j in range(len(comunas[comu[i]])):
+            for x in range(len(preguntas)):
+                for ss in range(len(preguntas[pregun[x]])):
+                    cosa=preguntas[pregun[x]][ss]
+                    if cosa == comunas[comu[i]][j]:
+                        co[comu[i]].add(pregun[x])
+                        print("true: ", cosa, pregun[x], comu[i])
+                        break
+                        #lis.append(cosa) 
+                
+
+    
+    return co
 def Generar_pdf(modeladmin,request,queryset):
     response = HttpResponse(content_type='application/pdf')
     
@@ -169,7 +271,8 @@ class Froe(admin.ModelAdmin):
 class ChoiceInline(admin.TabularInline):
     model =Comuna
 class FormularioAd(admin.ModelAdmin):
-     
+    preguntas=se_realiza()
+    print(preguntas)
     list_display=('id','rol','predio','proveedor','encargado','created_date','imagen')
     fieldsets=[
         ('Información Personal', {'fields':['encargado','proveedor','comuna','rol','predio','imagen']}),
@@ -189,7 +292,7 @@ class Predios(admin.ModelAdmin):
 
 
 class Pre(admin.ModelAdmin):
-  categorias()
+ 
   list_display=('pregunta','id', 'unouno','unodos',
 'unotres',
 'unocuatro',
