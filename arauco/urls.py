@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import url
-from formularioscdc.views import GeneratePDF
-
+from django.conf.urls import url, include
+from formularioscdc.views import cargar_preguntas
+from django.urls import reverse
 urlpatterns = [
     url(r'^admin/',admin.site.urls),
-    url(r'^pdf/',GeneratePDF,name="pdf"),
+    #url(r'^preguntas/',cargar_preguntas )
+    url(r'^chaining/',include('smart_selects.urls')),
     #path('admin/', admin.site.urls),
     #path('pdf/', views.generate_pdf, name='pdf'),
 

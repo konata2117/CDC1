@@ -1,18 +1,79 @@
 from django.contrib import admin
-from .models import Formulario, Pregunta,Respuesta, Proveedor, Comuna, Rol,Realiza
-from .resources import FormularioResource
-from import_export.admin import ImportExportModelAdmin
-from import_export.admin import ImportExportActionModelAdmin
-from formularioscdc.views import GeneratePDF
+from .models import Formulario, Pregunta,Respuesta, Proveedor, Comuna, Rol,Realiza,ParaPregunta
 from django.http import HttpResponse
 from io import BytesIO
 from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from django.db.models import Q  ,F  
-from io import StringIO
-from reportlab.platypus import BaseDocTemplate, Paragraph, Frame
+import xlsxwriter
 
+
+def Generar_pdf(modeladmin,request,queryset):
+    response = HttpResponse(content_type='application/pdf')
+
+    response['Content-Disposition']= 'filename= qr.rol.pdf'
+    buffer =BytesIO()
+    c= canvas.Canvas(buffer)
+    for qs in queryset:
+        nombre = qs.proveedor
+        id= qs.id
+        fecha= qs.created_date
+        fecha1=str(fecha)
+        d=fecha1.split(' ')
+        predio=qs.predio
+        id_proveedor=qs.proveedor_id
+    print (nombre,id,fecha,predio,id_proveedor)
+    rut_proveedor=Proveedor.objects.get(id=id_proveedor)
+    print (rut_proveedor.rut)
+    c.drawImage("imagenes/Arauco-logo.jpg",60,740,100,100,preserveAspectRatio=True)
+    c.drawString(170,750,"REPORTE VISITA CONTROL DE COMPRA")
+    c.line(60,740,540,740)
+    c.rect(60,710,480,23)
+    c.drawString(230,715,"DETALLE FORMULARIO")
+    c.drawString(60,690,"ID ")
+    c.drawString(305,690,"FECHA")
+    c.rect(60,660,235,20)
+    c.rect(305,660,235,20)
+    c.drawString(175,665,str(id))
+    c.drawString(385,665,d[0])
+    c.drawString(60,640,"RUT PROVEEDOR")
+    c.drawString(305,640,"PROVEEDOR")
+    c.rect(60,610,235,20)
+    c.rect(305,610,235,20)
+    c.drawString(145,615,str(rut_proveedor.rut))
+    c.drawString(345,615,str(nombre))
+    c.showPage()
+    c.save()
+    pdf=buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
+
+def Generar_excel(modeladmin,request,queryset):
+    response = HttpResponse(content_type='text/csv')
+    print (queryset[0])
+    response['Content-Disposition']= 'filename= query.xlsx'
+    writer = xlsxwriter.Workbook(response)
+    worksheet = writer.add_worksheet()
+    for qs in queryset:
+        nombre = qs.proveedor
+        id= qs.id
+        fecha= qs.created_date
+        fecha1=str(fecha)
+        d=fecha1.split(' ')
+        predio=qs.predio
+        id_proveedor=qs.proveedor_id
+    # Obtener los objetos que deseas exportar e iterar
+
+    #for objeto in queryset:
+
+    worksheet.write('A1',"ID")
+    worksheet.write('B1',"NOMBRE")
+    worksheet.write('C1',"RUT")
+    worksheet.write('A2',str(id))
+    worksheet.write('B2',str(nombre))
+    worksheet.write('C2',str(predio))
+    writer.close()
+
+    return response
 
 def indicadores():
     preguntas=Pregunta.objects.all()
@@ -93,16 +154,16 @@ def indicadores():
         cate[preguntas[i]].append(preguntas[i].cuatro)
         cate[preguntas[i]].append(preguntas[i].cinco)
 
-    
-    for i in range(numero): #obtengo los indicadores de las preguntas que se van a realizar 
+
+    for i in range(numero): #obtengo los indicadores de las preguntas que se van a realizar
         pregunt[preguntas[i]]=[]
         for j in range(32):
-            
+
             if cate[preguntas[i]][j]==True:
                 pregunt[preguntas[i]].append(nom[j])
-            
+
     #print (pregunt)
-    return pregunt 
+    return pregunt
 def riesgos():
     comunas=Comuna.objects.all()
     list = []
@@ -182,117 +243,122 @@ def riesgos():
         comun[comunas[i]].append(comunas[i].cuatro)
         comun[comunas[i]].append(comunas[i].cinco)
 
-    
-    for i in range(numero): #obtengo los indicadores de las preguntas que se van a realizar 
+
+    for i in range(numero): #obtengo los indicadores de las preguntas que se van a realizar
         riesgo[comunas[i]]=[]
         for j in range(32):
-            
+
             if comun[comunas[i]][j]==True:
                 riesgo[comunas[i]].append(nom[j])
-            
+
     #print (riesgo)
     return riesgo
-
+def actualizar(modeladmin,request,queryset):
+    Realiza.objects.all().delete()
+    preguntas=se_realiza()
+    comuna=Comuna.objects.all()
+    for i in range(len(preguntas)):
+        for j in range(len(preguntas[comuna[i]])):
+            tt=list(preguntas[comuna[i]])
+            add=Realiza.objects.create(comuna=str(comuna[i]), pregunta=str(tt[j]))
+            add.save()
 def se_realiza():
     comunas=riesgos()
     comu=Comuna.objects.all()
     pregun=Pregunta.objects.all()
     preguntas=indicadores()
-    la=set()
+
     co={}
     for i in range (len(comunas)):
         co[comu[i]]=set()
-    
-    lis =[]
+
+
     for i in range(len(comunas)):
-        print (len(comunas[comu[i]]))
+        #print (len(comunas[comu[i]]))
         for j in range(len(comunas[comu[i]])):
             for x in range(len(preguntas)):
                 for ss in range(len(preguntas[pregun[x]])):
                     cosa=preguntas[pregun[x]][ss]
                     if cosa == comunas[comu[i]][j]:
                         co[comu[i]].add(pregun[x])
-                        print("true: ", cosa, pregun[x], comu[i])
+                        #print("true: ", cosa, pregun[x], comu[i])
                         break
-                        #lis.append(cosa) 
-                
+                        #lis.append(cosa)
 
-    
+
+
     return co
-def Generar_pdf(modeladmin,request,queryset):
-    response = HttpResponse(content_type='application/pdf')
+class ChoiceInline(admin.StackedInline):
+    model = ParaPregunta
+    extra = 9
     
-    response['Content-Disposition']= 'filename= qr.rol.pdf'
-    buffer =BytesIO()
-    c= canvas.Canvas(buffer)
-    for qs in queryset:
-        nombre = qs.proveedor
-        id= qs.id
-        fecha= qs.created_date
-        dd=str(fecha)
-        d=dd.split(' ')
-        print ("d: ",d[0])
-        predio=qs.predio
-        id_proveedor=qs.proveedor_id
-    print (nombre,id,fecha,predio,id_proveedor)
-    rut_proveedor=Proveedor.objects.get(id=id_proveedor)
-    print (rut_proveedor.rut)
-    c.drawImage("imagenes/Arauco-logo.jpg",60,740,100,100,preserveAspectRatio=True)
-    c.drawString(170,750,"REPORTE VISITA CONTROL DE COMPRA")
-    c.line(60,740,540,740)
-    c.rect(60,710,480,23)
-    c.drawString(230,715,"DETALLE FORMULARIO")
-    c.drawString(60,690,"ID ")
-    c.drawString(305,690,"FECHA")
-    c.rect(60,660,235,20)
-    c.rect(305,660,235,20)
-    c.drawString(175,665,str(id))
-    c.drawString(345,665,d[0])
-    c.drawString(60,640,"RUT PROVEEDOR")
-    c.drawString(305,640,"PROVEEDOR")
-    c.rect(60,610,235,20)
-    c.rect(305,610,235,20)
-    c.drawString(145,615,str(rut_proveedor.rut))
-    c.drawString(345,615,str(nombre))
-    c.showPage()
-    c.save()
-    pdf=buffer.getvalue()
-    buffer.close()
-    response.write(pdf)
-    return response
 
+class REa(admin.ModelAdmin):
 
-class Froe(admin.ModelAdmin):
-    fieldsets=[
-        ('Información Personal', {'fields':['encargado','proveedor','rol','comuna']}),
-        
-   ]
-   
-class ChoiceInline(admin.TabularInline):
-    model =Comuna
+    list_display=('comuna','pregunta')
+    search_fields=('comuna','pregunta',)
+    actions=[actualizar]
 class FormularioAd(admin.ModelAdmin):
     preguntas=se_realiza()
-    print(preguntas)
-    list_display=('id','rol','predio','proveedor','encargado','created_date','imagen')
+    #print(preguntas)
+    def preguntas(self,obj):
+        print(obj.comuna)
+        pregunta=Realiza.objects.filter(comuna=obj.comuna)
+        print (pregunta)
+        for i in pregunta:
+           print (i.pregunta)
+           return  i.pregunta
+  
+    list_display=('id','rol','comuna','predio','proveedor','encargado','created_date','imagen','preguntas')
+    readonly_fields=('preguntas','pregunta',)
     fieldsets=[
-        ('Información Personal', {'fields':['encargado','proveedor','comuna','rol','predio','imagen']}),
-        ('Medidas de Control', {'fields':['pregunta','respuesta']}),
+       ('Información Personal', {'fields':['encargado','proveedor','comuna','rol','predio','imagen']}),
+        ('Medidas de Control', {'fields':['preguntas','respuesta']}),
     ]
-    actions =[Generar_pdf]
-    search_fields = ('id','predio',)
-   
-class FormularioAdmin(ImportExportModelAdmin):
-        resource_class=FormularioResource
-        list_display=('id','rol','proveedor','encargado','created_date','imagen')
-class FormularioAdmin(ImportExportActionModelAdmin):
-    pass
-
+    actions= [Generar_pdf,Generar_excel]
+    search_fields=('id','predio',)
+    #inlines=[ChoiceInline,]
+    def save(self,*args,**kwargs):
+        self.field3= self.preguntas()
+        super(Formulario,self).save(*args,**kwargs)
+    #inlines=[ChoiceInline]
+class Comu(admin.ModelAdmin):
+      list_display=('comuna', 'unouno','unodos',
+'unotres',
+'unocuatro',
+'unocinco',
+'unoseis',
+'unosiete',
+'unoocho',
+'unonueve',
+'unodiez',
+'unoonce',
+'unodoce',
+'unotrece',
+'unocatorce',
+'unoquince',
+'unodieciseis',
+'unodiecisiete',
+'unodieciocho',
+'unodiecinueve',
+'unoveinte',
+'unoveintiuno',
+'dosuno',
+'dosdos',
+'dostres',
+'tres',
+'tresuno',
+'tresdos',
+'trestres',
+'trescuatro',
+'trescinco',
+'tresseis',
+'cuatro',
+'cinco')
 class Predios(admin.ModelAdmin):
     list_display=('rol','proveedor')
-
-
+    search_fields=('rol','proveedor',)
 class Pre(admin.ModelAdmin):
- 
   list_display=('pregunta','id', 'unouno','unodos',
 'unotres',
 'unocuatro',
@@ -324,14 +390,17 @@ class Pre(admin.ModelAdmin):
 'trescinco',
 'tresseis',
 'cuatro',
-'cinco',
-'serealiza','tipo')
- 
+'cinco','tipo')
+class Provee(admin.ModelAdmin):
+    list_display=('nombre','rut')
+    search_fields=('nombre','rut',)
+  #inlines=[ChoiceInline]
+admin.site.register(Formulario, FormularioAd)
 
-   
-admin.site.register(Formulario, FormularioAd)    
+
 admin.site.register(Pregunta,Pre)
 admin.site.register(Respuesta)
-admin.site.register(Proveedor)
-admin.site.register(Comuna)
+admin.site.register(Proveedor,Provee)
+admin.site.register(Comuna,Comu)
 admin.site.register(Rol,Predios)
+admin.site.register(Realiza,REa)

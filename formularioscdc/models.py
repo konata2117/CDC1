@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from smart_selects.db_fields import ChainedForeignKey
 
 class Proveedor(models.Model):
     nombre=models.CharField(max_length=30)
@@ -86,7 +87,7 @@ class Pregunta(models.Model):
     tresseis= models.BooleanField(default=True)
     cuatro= models.BooleanField(default=True)
     cinco= models.BooleanField(default=True)
-    serealiza=models.BooleanField(default=True)
+    #serealiza=models.BooleanField(default=True)
     tipo=models.CharField(max_length=30,blank=True)
     def __str__(self):
         return self.pregunta
@@ -95,14 +96,15 @@ class Pregunta(models.Model):
         verbose_name_plural="Preguntas"
 
 class Realiza(models.Model):
-    comuna=models.ForeignKey(Comuna,on_delete=models.CASCADE)
-    pregunta =models.ForeignKey(Pregunta,on_delete=models.CASCADE)
-    #def __str__(self):
-     #   return "uno"
+    comuna=models.CharField(max_length=30,blank=True,null=True)
+    pregunta =models.CharField(max_length=300,blank=True,null=True)
+    def __str__(self):
+        return str(self.comuna)
 
 class Respuesta(models.Model):
-    pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True,null=True)
+    pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True, null =True)
     respuesta=models.CharField(max_length=30)
+    tipo=models.CharField(max_length=50, blank=True, null=True)
     def __str__(self):
         return self.respuesta
     class Meta:
@@ -117,24 +119,26 @@ class Rol(models.Model):
     def __str__(self):
         return self.rol
 
-    
+
 class Formulario(models.Model):
     encargado=models.ForeignKey( 'auth.User', on_delete=models.CASCADE)
     proveedor =models.ForeignKey(Proveedor,on_delete=models.CASCADE)
     rol=models.ForeignKey(Rol,on_delete=models.CASCADE, blank=True,null=True)
     predio=models.CharField(max_length=20)
-    comuna=models.ForeignKey(Comuna,on_delete=models.CASCADE)
-    imagen=models.ImageField(upload_to='imagenes/', null=True,blank=True) 
+    comuna=models.ForeignKey(Comuna,on_delete=models.CASCADE,blank=True,null=True)
+    imagen=models.ImageField(upload_to='imagenes/', null=True,blank=True)
     #categoria=models.ForeignKey(Comuna,on_delete=models.CASCADE,blank=True,null=True)
-    created_date = models.DateTimeField(
-            default=timezone.now)
-    pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE,null=True,blank=True)
+    created_date = models.DateTimeField(default=timezone.now)
+    pregunta=models.CharField(max_length=300,null=True,blank=True)
     respuesta=models.ForeignKey(Respuesta,on_delete=models.CASCADE,null=True,blank=True)
-    def contador_preguntas(self, comuna):
-        print ("ACA")
+    def preguntas(self):
+        return '{}'.format(self.pregunta)
     def __str__(self):
         return self.predio
     class Meta:
-       verbose_name="Formulario"
-       verbose_name_plural="Formularios"
-
+        verbose_name="Formulario"
+        verbose_name_plural="Formularios"
+   
+class ParaPregunta(models.Model):
+    pregunta=models.ForeignKey(Formulario,on_delete=models.CASCADE,blank=True,null=True)
+    

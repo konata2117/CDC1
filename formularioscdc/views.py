@@ -3,19 +3,14 @@
 from django.http import HttpResponse
 from django.views.generic import View
 from django.db import models
-from .utils import render_to_pdf
+from .models import Realiza
 from .models import Proveedor
 
+def cargar_preguntas(request):
+    comuna_id=request.GET.get('ANGOL')
+    preguntas=Realiza.objects.filter(comuna=comuna_id)
 
-def GeneratePDF(View):
-    def get(self, request, *args, **kwargs):
-        proveedor = Proveedor.objects.get(id=kwargs.get('id'))
-        context ={
-            "proveedor_nombre": proveedor_nombre,
-            "proveedor_rut": proveedor_rut
-        }
-        pdf = render_to_pdf('pdf/pdfs.html',context)
-        return HttpResponse(pdf,content_type='application/pdf')
+    #return render(request)
         #response = HttpResponse(content_type='application/pdf')
         #buffer=BytesIO()
         #pdf=canvas.Canvas(buffer)
