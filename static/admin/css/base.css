@@ -473,7 +473,7 @@ a.button {
     float: right;
     border: none;
     font-weight: 400;
-    background: #12751e;
+    background: #417690;
 }
 
 .button.default:active, input[type=submit].default:active,
@@ -520,7 +520,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 13px;
     text-align: left;
-    background: #79aec8;
+    background: #77B55F;
     color: #fff;
 }
 
@@ -729,7 +729,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .object-tools a:focus, .object-tools a:hover {
-    background-color: #12751e;
+    background-color: #417690;
 }
 
 .object-tools a:focus{

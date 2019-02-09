@@ -1,0 +1,17 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<table>
+    <tbody>
+    {% if preguntas%}
+    {% for pregunta in preguntas %}
+       <tr>
+          <td>      {{ pregunta.pregunta |linebreaksbr}} </td>
+        
+          </tr>
+        
+    {% endfor %}
+    {% endif %}
+    </tbody>
+    </table>
+{% endblock %}

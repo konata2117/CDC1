@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from smart_selects.db_fields import ChainedForeignKey
-
+from django.forms import ModelForm
 class Proveedor(models.Model):
     nombre=models.CharField(max_length=30)
     rut=models.CharField(max_length=30)
@@ -11,6 +11,7 @@ class Proveedor(models.Model):
     class Meta:
         verbose_name="Proveedor"
         verbose_name_plural="Proveedores"
+        
 class Comuna(models.Model):
     comuna =models.CharField(max_length=30, primary_key=True)
     unouno= models.BooleanField(default=True)
@@ -99,17 +100,23 @@ class Realiza(models.Model):
     comuna=models.CharField(max_length=30,blank=True,null=True)
     pregunta =models.CharField(max_length=300,blank=True,null=True)
     def __str__(self):
-        return str(self.comuna)
+        return str(self.pregunta)
 
-class Respuesta(models.Model):
-    pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True, null =True)
-    respuesta=models.CharField(max_length=30)
-    tipo=models.CharField(max_length=50, blank=True, null=True)
+class RespuestaBinaria(models.Model):
+    SI='SI'
+    NO='NO'
+    res=((SI, 'SI'), (NO,'NO'),)
+    #pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True, null =True)
+    respuesta=models.CharField(max_length=10,choices=res)
+    comentario=models.CharField(max_length=300)
+    tipo=models.CharField(max_length=50, blank=True, null=True,default='BINARIA')
     def __str__(self):
         return self.respuesta
     class Meta:
-        verbose_name="Respuesta"
-        verbose_name_plural="Respuestas"
+        verbose_name="Respuesta_Binaria"
+        verbose_name_plural="Respuestas_Binarias"
+
+
 class Rol(models.Model):
     proveedor=models.ForeignKey(Proveedor,on_delete=models.CASCADE)
     rol=models.CharField(max_length=70)
@@ -129,8 +136,9 @@ class Formulario(models.Model):
     imagen=models.ImageField(upload_to='imagenes/', null=True,blank=True)
     #categoria=models.ForeignKey(Comuna,on_delete=models.CASCADE,blank=True,null=True)
     created_date = models.DateTimeField(default=timezone.now)
-    pregunta=models.CharField(max_length=300,null=True,blank=True)
-    respuesta=models.ForeignKey(Respuesta,on_delete=models.CASCADE,null=True,blank=True)
+    pregunta=models.ForeignKey(Realiza,blank=True,null=True,on_delete=models.CASCADE)
+    respuesta=models.ForeignKey(RespuestaBinaria,on_delete=models.CASCADE,null=True,blank=True)
+    comentario =models.CharField(max_length=300,blank=True,null=True)
     def preguntas(self):
         return '{}'.format(self.pregunta)
     def __str__(self):
@@ -138,7 +146,3 @@ class Formulario(models.Model):
     class Meta:
         verbose_name="Formulario"
         verbose_name_plural="Formularios"
-   
-class ParaPregunta(models.Model):
-    pregunta=models.ForeignKey(Formulario,on_delete=models.CASCADE,blank=True,null=True)
-    
