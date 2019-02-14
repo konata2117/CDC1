@@ -18,12 +18,11 @@ from django.urls import path
 from django.conf.urls import url, include
 from formularioscdc.views import preguntas
 from django.urls import reverse
-import forms_builder.forms.urls
+
 urlpatterns = [
-    url(r'^admin/formularioscdc/formulario/2/change',preguntas, name="preguntas"),
+   
     url(r'^admin/',admin.site.urls),
-    url(r'^forms/', include(forms_builder.forms.urls)),
-    url(r'^chaining/',include('smart_selects.urls')),
+    
     #path('admin/', admin.site.urls),
     #path('pdf/', views.generate_pdf, name='pdf'),
 

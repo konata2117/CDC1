@@ -102,19 +102,7 @@ class Realiza(models.Model):
     def __str__(self):
         return str(self.pregunta)
 
-class RespuestaBinaria(models.Model):
-    SI='SI'
-    NO='NO'
-    res=((SI, 'SI'), (NO,'NO'),)
-    #pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE, blank=True, null =True)
-    respuesta=models.CharField(max_length=10,choices=res)
-    comentario=models.CharField(max_length=300)
-    tipo=models.CharField(max_length=50, blank=True, null=True,default='BINARIA')
-    def __str__(self):
-        return self.respuesta
-    class Meta:
-        verbose_name="Respuesta_Binaria"
-        verbose_name_plural="Respuestas_Binarias"
+
 
 
 class Rol(models.Model):
@@ -126,8 +114,19 @@ class Rol(models.Model):
     def __str__(self):
         return self.rol
 
+class Asociada(models.Model):
+    pregunta=models.ForeignKey(Pregunta,on_delete=models.CASCADE,null=True,blank=True)
+    respuesta=models.CharField(max_length=400,null=True,blank=True)
 
+    def __str__(self):
+        return str(self.respuesta)
+
+
+    
 class Formulario(models.Model):
+    FINALIZADO='FINALIZADO'
+    PROCESO='EN PROCESO'
+    Res=((FINALIZADO,'FINALIZADO'),(PROCESO,'EN PROCESO'),)
     encargado=models.ForeignKey( 'auth.User', on_delete=models.CASCADE)
     proveedor =models.ForeignKey(Proveedor,on_delete=models.CASCADE)
     rol=models.ForeignKey(Rol,on_delete=models.CASCADE, blank=True,null=True)
@@ -137,10 +136,10 @@ class Formulario(models.Model):
     #categoria=models.ForeignKey(Comuna,on_delete=models.CASCADE,blank=True,null=True)
     created_date = models.DateTimeField(default=timezone.now)
     pregunta=models.ForeignKey(Realiza,blank=True,null=True,on_delete=models.CASCADE)
-    respuesta=models.ForeignKey(RespuestaBinaria,on_delete=models.CASCADE,null=True,blank=True)
+    respuesta=models.ForeignKey(Asociada,null=True,blank=True,on_delete=models.CASCADE)
     comentario =models.CharField(max_length=300,blank=True,null=True)
-    def preguntas(self):
-        return '{}'.format(self.pregunta)
+    estado_formulario=models.CharField(max_length=30,choices=Res, null=True,blank=True)
+    
     def __str__(self):
         return self.predio
     class Meta:

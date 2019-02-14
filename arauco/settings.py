@@ -35,9 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'smart_selects',
-    'forms_builder.forms',
+    
+    
     'formularioscdc',
 ]
 

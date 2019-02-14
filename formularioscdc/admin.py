@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
-from .models import Formulario, Pregunta,RespuestaBinaria, Proveedor, Comuna, Rol,Realiza
+from .models import Formulario, Pregunta, Proveedor, Comuna, Rol,Realiza,Asociada
 from django.http import HttpResponse
 from io import BytesIO
 from reportlab.pdfgen import canvas
@@ -141,8 +141,7 @@ def Generar_Formulario(modeladmin,request,queryset):
     response.write(pdf)
     return response
     
-def res_pre():
-    preguntas=Pregunta.objects.filter(tipo='BINARIA')
+
     #for i in preguntas:
      #   print (i.pregunta) 
     
@@ -361,7 +360,10 @@ def se_realiza():
 
     return co
 
-
+class Resp(admin.TabularInline):
+   model=Asociada
+   extra=0
+    
 class REa(admin.ModelAdmin):
 
     list_display=('comuna','pregunta')
@@ -375,33 +377,56 @@ class ForForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ForForm, self).__init__(*args, **kwargs)
         self.fields['pregunta'].queryset = Realiza.objects.filter(comuna=self.instance.comuna)
+        #self.instance.pregunta_id=29697
+        #realiza=Realiza.objects.filter(id=instance.pregunta_id)
+        
+        #self.fields['respuesta'].queryset=Asociada.objects.none()
+        
+            
+        #preguntas=Realiza.objects.get(id=self.instance.pregunta_id)
+        #prf=Pregunta.objects.get(pregunta=preguntas.pregunta)
+        #respuesta=Asociada.objects.filter(pregunta_id=prf.id)
+        #self.fields['respuesta']=Asociada.objects.filter(pregunta_id=prf.id)
+        
+        #self.fields['respuesta'].queryset=Asociada.objects.filter(pregunta_id=38)
+        #print ("respuestas", self.fields['respuesta'].queryset)
 class FormularioAd(admin.ModelAdmin):
     #preguntas=se_realiza()
     #print(preguntas)
-    res_pre()
+    
     form = ForForm
-    def preguntas(self,obj):
+    def respuesta1(self,obj):
         #print(obj.comuna)
-        pregunta=Realiza.objects.filter(comuna=obj.comuna)
+        #pregunta=Realiza.objects.filter(comuna=obj.comuna)
+        if obj.pregunta_id.exists():
+            preguntas=Realiza.objects.get(id=obj.pregunta_id)
+            prf=Pregunta.objects.get(pregunta=preguntas.pregunta)
+            respuesta=Asociada.objects.filter(pregunta_id=prf.id)
+            self.fields['respuesta'].queryset=Asociada.objects.filter(pregunta_id=prf.id)
+            for i in self.fields['respuesta'].queryset:
+                return i.respuesta
+        #return self.fields['respuesta'].queryset
+        #for i in respuesta:
+         #   print(i.respuesta)
+
+        
         #for p in pregunta:
             #print (p.pregunta)
         #contexto={'preguntas':pregunta}
         #return render(request,'admin/prueba.html',contexto)
-  
-    list_display=('id','rol','comuna','predio','proveedor','encargado','created_date','imagen')
-    readonly_fields=('preguntas',)
+    list_filter=('estado_formulario',)
+    list_display=('id','rol','comuna','predio','proveedor','encargado','created_date','estado_formulario')
+    readonly_fields=('respuesta1',)
+    
     fieldsets=[
-       ('Información Personal', {'fields':['encargado','proveedor','comuna','rol','predio','imagen']}),
-        ('Medidas de Control', {'fields':['pregunta','respuesta','comentario']}),
+       ('Información Personal', {'fields':[('encargado','proveedor'),('comuna','rol'),'predio','imagen']}),
+        ('Medidas de Control', {'fields':['pregunta','respuesta1','comentario','estado_formulario']}),
+    #{'fields':('preguntas')},
     ]
     actions= [Generar_Reporte,Generar_Formulario]
     search_fields=('id','predio',)
     
-    #inlines=[ChoiceInline,]
-    def save(self,*args,**kwargs):
-        self.field3= self.preguntas()
-        super(Formulario,self).save(*args,**kwargs)
-    #inlines=[ChoiceInline]
+   
 class Comu(admin.ModelAdmin):
       list_display=('comuna', 'unouno','unodos',
 'unotres',
@@ -439,6 +464,7 @@ class Predios(admin.ModelAdmin):
     list_display=('rol','proveedor')
     search_fields=('rol','proveedor',)
 class Pre(admin.ModelAdmin):
+  inlines=[Resp]  
   list_display=('pregunta','id', 'unouno','unodos',
 'unotres',
 'unocuatro',
@@ -482,5 +508,5 @@ admin.site.register(Pregunta,Pre)
 admin.site.register(Realiza,REa)
 admin.site.register(Proveedor,Provee)
 admin.site.register(Rol,Predios)
-admin.site.register(RespuestaBinaria)
+#admin.site.register(Respuesta)
 admin.site.register(Formulario, FormularioAd)
