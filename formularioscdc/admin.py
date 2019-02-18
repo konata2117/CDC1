@@ -377,50 +377,28 @@ class ForForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ForForm, self).__init__(*args, **kwargs)
         self.fields['pregunta'].queryset = Realiza.objects.filter(comuna=self.instance.comuna)
-        #self.instance.pregunta_id=29697
-        #realiza=Realiza.objects.filter(id=instance.pregunta_id)
         
-        #self.fields['respuesta'].queryset=Asociada.objects.none()
-        
-            
-        #preguntas=Realiza.objects.get(id=self.instance.pregunta_id)
-        #prf=Pregunta.objects.get(pregunta=preguntas.pregunta)
-        #respuesta=Asociada.objects.filter(pregunta_id=prf.id)
-        #self.fields['respuesta']=Asociada.objects.filter(pregunta_id=prf.id)
+        if self.instance.pregunta_id:
+    
+            preguntas=Realiza.objects.get(id=self.instance.pregunta_id)
+            prf=Pregunta.objects.get(pregunta=preguntas.pregunta)
+            respuesta=Asociada.objects.filter(pregunta_id=prf.id)
+            self.fields['respuesta'].queryset=Asociada.objects.filter(pregunta_id=prf.id)
         
         #self.fields['respuesta'].queryset=Asociada.objects.filter(pregunta_id=38)
         #print ("respuestas", self.fields['respuesta'].queryset)
 class FormularioAd(admin.ModelAdmin):
-    #preguntas=se_realiza()
-    #print(preguntas)
+  
     
     form = ForForm
-    def respuesta1(self,obj):
-        #print(obj.comuna)
-        #pregunta=Realiza.objects.filter(comuna=obj.comuna)
-        if obj.pregunta_id.exists():
-            preguntas=Realiza.objects.get(id=obj.pregunta_id)
-            prf=Pregunta.objects.get(pregunta=preguntas.pregunta)
-            respuesta=Asociada.objects.filter(pregunta_id=prf.id)
-            self.fields['respuesta'].queryset=Asociada.objects.filter(pregunta_id=prf.id)
-            for i in self.fields['respuesta'].queryset:
-                return i.respuesta
-        #return self.fields['respuesta'].queryset
-        #for i in respuesta:
-         #   print(i.respuesta)
-
-        
-        #for p in pregunta:
-            #print (p.pregunta)
-        #contexto={'preguntas':pregunta}
-        #return render(request,'admin/prueba.html',contexto)
-    list_filter=('estado_formulario',)
+ 
+    list_filter=('estado_formulario','encargado')
     list_display=('id','rol','comuna','predio','proveedor','encargado','created_date','estado_formulario')
-    readonly_fields=('respuesta1',)
+
     
     fieldsets=[
        ('Información Personal', {'fields':[('encargado','proveedor'),('comuna','rol'),'predio','imagen']}),
-        ('Medidas de Control', {'fields':['pregunta','respuesta1','comentario','estado_formulario']}),
+        ('Medidas de Control', {'fields':['pregunta','respuesta','comentario','estado_formulario']}),
     #{'fields':('preguntas')},
     ]
     actions= [Generar_Reporte,Generar_Formulario]
